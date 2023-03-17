@@ -1,0 +1,126 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+:root {
+    --blue:  #5dade2;
+    --green:  #2ecc71;
+    --red:  #e74c3c;
+    --orange:  #f39c12;
+}
+
+body {
+    font-family: 'Lato', sans-serif;
+}
+
+.container {
+    display: grid;
+    grid-template-columns: 25% 70%;
+    height: 100vh;
+}
+
+.container .sidebar {
+    grid-column: 1;
+    padding: 1rem;
+    background-color: #414141;
+    height: 100%;
+}
+
+.container .sidebar .search-container {
+    width: 100%;
+}
+
+.sidebar .search-container .search-input {
+    width: 100%;
+    margin: 1.8rem 0;
+}
+
+.search-container .search-input input {
+    width: 100%;
+    padding: .5rem 2rem;
+    border-radius: 10px;
+    border: none;
+    outline: none;
+    background-color: #ccc;
+}
+
+.container .sidebar .planning-infos {
+    display: grid;
+    grid-template-columns: repeat(2, 48%);
+    grid-template-rows: repeat(2, 100px);
+    gap: 10px;
+    color: #fff;
+    margin: 2rem 0;
+}
+
+.sidebar .planning-infos .planning-info {
+    background-color: rgba(204, 204, 204, .5);
+    border-radius: 10px;
+    padding: .5rem;
+    position: relative;
+    display: grid;
+    grid-template-columns: 80% 20%;
+    grid-template-rows: 70% 30%;
+    cursor: pointer;
+}
+
+.planning-infos .planning-info :first-child {
+    width: 30px;
+    height: 30px;
+    background-color: coral;
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    grid-row: 1;
+    grid-column: 1;
+}
+
+.planning-infos .planning-info:first-child :first-child {
+    background-color: var(--blue);
+}
+
+.planning-infos .planning-info:nth-child(2) :first-child {
+    background-color: var(--green);
+}
+
+.planning-infos .planning-info:nth-child(3) :first-child {
+    background-color: var(--orange);
+}
+
+.planning-infos .planning-info:last-child :first-child {
+    background-color: var(--red);
+}
+
+.planning-infos .planning-info .num {
+    font-size: 1.3rem;
+    font-weight: bold;
+    grid-row: 1;
+    grid-column: 2;
+    position: absolute;
+    top: -5px;
+    right: .5rem;
+}
+
+.planning-info .planning-info-name {
+    grid-row: 2;
+    grid-column: 1;
+}
+
+.planning-infos .planning-info :last-child {
+    font-size: .8rem;
+    grid-row: 2;
+    grid-column: 2;
+    position: absolute;
+    right: 2.8rem;
+    bottom: 1rem;
+}
+
+.sidebar .selected-planning-container select {
+    width: 100%;
+    padding: .5rem;
+    border: none;
+    border-radius: 10px;
+}
