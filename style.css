@@ -9,15 +9,18 @@
     --green:  #2ecc71;
     --red:  #e74c3c;
     --orange:  #f39c12;
+    --gray: #414141;
+    --light-gray: #ccc;
 }
 
 body {
     font-family: 'Lato', sans-serif;
+    background-color: var(--gray);
 }
 
 .container {
     display: grid;
-    grid-template-columns: 25% 70%;
+    grid-template-columns: 25% 75%;
     height: 100vh;
 }
 
@@ -64,6 +67,22 @@ body {
     grid-template-columns: 80% 20%;
     grid-template-rows: 70% 30%;
     cursor: pointer;
+}
+
+.sidebar .planning-infos .planning-info.active:first-child {
+    background-color: var(--blue);
+}
+
+.sidebar .planning-infos .planning-info.active:nth-child(2) {
+    background-color: var(--green);
+}
+
+.sidebar .planning-infos .planning-info.active:nth-child(3) {
+    background-color: var(--orange);
+}
+
+.sidebar .planning-infos .planning-info.active:last-child {
+    background-color: var(--red);
 }
 
 .planning-infos .planning-info :first-child {
@@ -123,4 +142,149 @@ body {
     padding: .5rem;
     border: none;
     border-radius: 10px;
+}
+
+.main-content {
+    grid-column: 2;
+    height: 100%;
+}
+
+.main-content .header {
+    width: 100%;
+    height: 150px;
+    background-color: #000;
+    color: #FFF;
+    padding: 0 1rem;
+    font-size: 1.3rem;
+    position: relative;
+}
+
+.main-content .header .planning-name-icon {
+    display: flex;
+    justify-content: space-between;
+    position: relative;
+    top: 50%;
+    transform: translateY(-50%);
+}
+
+.main-content .header .planning-name {
+    font-weight: bold;
+}
+
+.main-content .header .switch-display-mode {
+    width: 70px;
+    height: 40px;
+    background-color: #ccc;
+    border-radius: 20px;
+    position: relative;
+    cursor: pointer;
+}
+
+.main-content .header .switch-display-mode::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    left: 3px;
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background-color: #414141;
+    transition: all .5s;
+}
+
+.main-content .header .switch-display-mode.active::before {
+    left: 55%;
+    background-color: #FFF;
+}
+
+.main-content .courses-number {
+    position: absolute;
+    bottom: .5rem;
+    left: 1rem;
+    font-size: 1rem;
+    opacity: .9;
+}
+
+.main-content .schedule {
+    height: auto;
+}
+
+.main-content .schedule .schedule_hour {
+    padding: .5rem 0;
+    display: grid;
+    grid-template-columns: 200px repeat(10, 1fr);
+    font-size: 1.1rem;
+    background-color: #ccc;
+}
+
+.main-content .schedule .schedule_hour :first-child {
+    grid-column: 2;
+}
+
+.main-content .schedule .schedule_day {
+    display: grid;
+    grid-template-rows: repeat(6, 120px);
+    gap: 5px;
+    color: #FFF;
+}
+
+.main-content .schedule .schedule_day > div {
+    display: grid;
+    grid-template-columns: 200px repeat(10, 1fr);
+    align-items: center;
+    border-radius: 15px;
+}
+
+.schedule_day > div {
+    background-color: #f2ffcd3d;
+    height: 100%;
+}
+
+.schedule_day > div > :first-child {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    height: 100%;
+    background-color: #000;
+    font-size: 1.3rem;
+    width: 95%;
+    padding: 0 .5rem;
+    border-radius: 15px;
+}
+
+.schedule_day > div > :first-child > i {
+    color: var(--green);
+    cursor: pointer;
+}
+
+.schedule_day > div .planning {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    grid-column: 4 / span 2;
+    background-color: var(--orange);
+    height: 100%;
+    width: 100%;
+    border-radius: 15px;
+    position: relative;
+}
+
+.schedule_day > div .planning :nth-child(2) {
+    font-size: 1.4rem;
+    font-weight: bold;
+    margin: .5rem 0;
+}
+
+.schedule_day > div .planning .close {
+    position: absolute;
+    top: 5px;
+    right: 10px;
+    font-size: 2rem;
+    font-weight: bold;
+    cursor: pointer;
+    color: var(--red);
+    
 }

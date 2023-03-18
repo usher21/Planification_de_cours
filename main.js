@@ -63,3 +63,21 @@ let p = new Cour("JS", "Aly", 102, 10, 13)
 let p1 = new Cour("C", "Wane", 103, 10, 12)
 
 console.log(p.isIntersect(p1.heureDebut, p1.heureFin));
+
+const classes = ["L2 GLRS A", "L2 GLRS B", "L2 ETSE", "L1 A", "IAGE B", "L2 CDSD"]
+const enseignants = ["Aly", "Baila", "Ndoye", "Mbaye", "Djibi", "Seckouba"]
+const salles = ["101", "102", "103", "104", "201", "incube"]
+const modules = ["ALGO", "PHP", "PYTHON", "LC", "JAVASCRIPT", "JAVA"]
+
+const btnSwitch = document.querySelector('.switch-display-mode')
+
+btnSwitch.addEventListener('click', () => btnSwitch.classList.toggle('active'))
+
+const planningInfo = document.querySelectorAll('.planning-info')
+
+planningInfo.forEach((planning) => {
+    planning.addEventListener('click', (e) => {
+        Array.from(planningInfo).map(p => p.classList.remove('active'))
+        e.currentTarget.classList.add('active')
+    })
+})

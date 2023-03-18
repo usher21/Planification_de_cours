@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Planning</title>
     <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css"
+        integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
     <script src="main.js" defer></script>
 </head>
+
 <body>
     <div class="container">
         <div class="sidebar">
@@ -48,16 +52,92 @@
             </div>
 
             <div class="selected-planning-container">
-                <select name="" id="">
-                    <option value="Enseignat">Aly</option>
+                <select name="planning-choice" id="planning-choice">
+                    <option value="enseignant">Aly</option>
                 </select>
             </div>
         </div>
+
         <div class="main-content">
             <header class="header">
-                
+                <div class="planning-name-icon">
+                    <span class="planning-name">Planning: L2 GL</span>
+                    <div class="switch-display-mode"></div>
+                </div>
+                <span class="courses-number">4 cours</span>
             </header>
+
+            <div class="schedule">
+                <div class="schedule_hour">
+                    <div class="hour">8H</div>
+                    <div class="hour">9H</div>
+                    <div class="hour">10H</div>
+                    <div class="hour">11H</div>
+                    <div class="hour">12H</div>
+                    <div class="hour">13H</div>
+                    <div class="hour">14H</div>
+                    <div class="hour">15H</div>
+                    <div class="hour">16H</div>
+                    <div class="hour">17H</div>
+                </div>
+
+                <div class="schedule_day">
+                    <div id="d_1">
+                        <div class="day1">
+                            <span>Lundi</span>
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <div class="planning">
+                            <span>Aly</span>
+                            <span>JavaScript</span>
+                            <span>104</span>
+                            <span class="close">&times;</span>
+                        </div>
+                    </div>
+                    <div id="d_2">
+                        <div class="day2">
+                            <span>Mardi</span>
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+
+                    </div>
+                    <div id="d_3">
+                        <div class="day3">
+                            <span>Mercredi</span>
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                        <div class="planning">
+                            <span>JavaScript</span>
+                            <span>A2FD</span>
+                            <span>104</span>
+                            <span class="close">&times;</span>
+                        </div>
+                    </div>
+                    <div id="d_4">
+                        <div class="day4">
+                            <span>Jeudi</span>
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                    </div>
+                    <div id="d_5">
+                        <div class="day5">
+                            <span>Vendredi</span>
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                    </div>
+                    <div id="d_6">
+                        <div class="day6">
+                            <span>Samedi</span>
+                            <i class="fa-solid fa-plus"></i>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
         </div>
+
     </div>
 </body>
+
 </html>
