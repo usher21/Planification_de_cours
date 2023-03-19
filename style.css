@@ -282,9 +282,8 @@ body {
     position: absolute;
     top: 5px;
     right: 10px;
-    font-size: 2rem;
+    font-size: 1.2rem;
     font-weight: bold;
     cursor: pointer;
     color: var(--red);
-    
 }
