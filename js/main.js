@@ -27,7 +27,107 @@ const btnSwitch = document.querySelector('.switch-display-mode')
 const planningInfo = document.querySelectorAll('.planning-info')
 const planningChoice = document.querySelector('#planning-choice')
 
+
 btnSwitch.addEventListener('click', () => btnSwitch.classList.toggle('active'))
+
+/*----------------------------------------------------------------------------------------------------------*/
+const modalContainer = document.querySelector('.modal-container')
+const openModal = document.querySelectorAll('.open-modal')
+const addBtn = document.querySelector('.add-planning')
+const cancelButton = document.querySelector('.cancel')
+const selectInput = modalContainer.querySelectorAll('select')
+const errorPara = document.querySelector('.error')
+
+for (const plusBtn of openModal) {
+    plusBtn.addEventListener('click', (e) => {
+        modalContainer.classList.add('active')
+        clearSelectInput()
+        fillInfos(selectInput[0], 'Choisir un module', planningInfos[3])
+        fillInfos(selectInput[1], 'Choisir un enseignant', planningInfos[0])
+        fillInfos(selectInput[2], 'Choisir une salle', planningInfos[1])
+        fillHours(selectInput[3], 8, 16)
+        fillHours(selectInput[4], 9, 17)
+        const parent = e.currentTarget.parentElement
+        console.log(parent);
+        addPlanning(parent)
+    })
+}
+
+function addPlanning(parent) {
+    addBtn.addEventListener('click', () => {
+        const day = parent.classList.item(0)[3]
+        const module = selectInput[0].value
+        const teacher = selectInput[1].value
+        const room = selectInput[2].value
+        const startTime = selectInput[3].value.split(' ')[0]
+        const endTime = selectInput[4].value.split(' ')[0]
+
+        if (!checkSelectInput(module, teacher, room) || !checkSelectInput(startTime, endTime)) {
+            errorPara.innerText = 'Veuillez selectionner tous les options'
+            errorPara.style.display = 'block'
+        } else {
+            errorPara.style.display = 'none'
+            appendTo(day, startTime, endTime, createPlanning(module, teacher, room))
+            if (localStorage.length != 0) {
+                let index = Object.entries(localStorage)[localStorage.length - 1][0]
+                savePlanning(day, startTime, endTime, module, teacher, room, index)
+            } else {
+                savePlanning(day, startTime, endTime, module, teacher, room, 1)
+            }
+            closeModal()
+        }
+    })
+}
+
+function clearSelectInput() {
+    selectInput.forEach((select) => select.innerHTML = '')
+}
+
+function checkSelectInput(...data) {
+    for (const select of selectInput) {
+        for (let i = 0; i < data.length; i++) {
+            if (data[i] == select.options[0].value) {
+                return false
+            }
+        }
+    }
+    return true
+}
+
+function closeModal() {
+    modalContainer.classList.remove('active')
+}
+cancelButton.addEventListener('click', closeModal)
+
+function savePlanning(day, startTime, endTime, module, teacher, room, index) {
+    const planning = {
+        'day': day,
+        'start': startTime,
+        'end': endTime,
+        'module': module,
+        'teacher': teacher,
+        'room': room
+    }
+    localStorage.setItem(index, JSON.stringify(planning))
+}
+
+function fillHours(selectInput, startTime, endTime) {
+    selectInput.innerHTML = `<option>Choisir une heure</option>`
+    for (let i = startTime; i <= endTime; i++) {
+        selectInput.innerHTML += `<option>${i} H</option>`
+    }
+}
+
+function fillInfos(selectInput, title, planning) {
+    for (let i = 0; i < planning.length; i++) {
+        if (i === 0)
+        selectInput.innerHTML += `<option>${title}</option>`
+        else
+            selectInput.innerHTML += `<option>${planning[i]}</option>`
+    }
+}
+
+/*----------------------------------------------------------------------------------------------------------*/
 
 planningInfo.forEach((planning, index) => {
     planning.addEventListener('click', (e) => {
@@ -44,4 +144,4 @@ function fillPlanningChoice(index) {
     }
 }
 
-appendTo(6, 10, 15, createPlanning('JavaScript', 'Aly', 104))
+/*----------------------------------------------------------------------------------------------------------*/

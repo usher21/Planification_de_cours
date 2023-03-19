@@ -1,4 +1,5 @@
 export class Course {
+    
     #moduleName = ""
     #teacher = ""
     #room = 0
