@@ -39,7 +39,8 @@ const selectInput = modalContainer.querySelectorAll('select')
 const errorPara = document.querySelector('.error')
 
 for (const plusBtn of openModal) {
-    plusBtn.addEventListener('click', (e) => {
+    plusBtn.onclick = (e) => {
+        modalContainer.querySelector('.day').innerText = e.currentTarget.parentElement.classList.item(0)[3]
         modalContainer.classList.add('active')
         clearSelectInput()
         fillInfos(selectInput[0], 'Choisir un module', planningInfos[3])
@@ -47,15 +48,14 @@ for (const plusBtn of openModal) {
         fillInfos(selectInput[2], 'Choisir une salle', planningInfos[1])
         fillHours(selectInput[3], 8, 16)
         fillHours(selectInput[4], 9, 17)
-        const parent = e.currentTarget.parentElement
-        console.log(parent);
-        addPlanning(parent)
-    })
+    }
 }
 
-function addPlanning(parent) {
+addPlanning()
+
+function addPlanning() {
     addBtn.addEventListener('click', () => {
-        const day = parent.classList.item(0)[3]
+        const day = modalContainer.querySelector('.day').innerText
         const module = selectInput[0].value
         const teacher = selectInput[1].value
         const room = selectInput[2].value
@@ -68,12 +68,7 @@ function addPlanning(parent) {
         } else {
             errorPara.style.display = 'none'
             appendTo(day, startTime, endTime, createPlanning(module, teacher, room))
-            if (localStorage.length != 0) {
-                let index = Object.entries(localStorage)[localStorage.length - 1][0]
-                savePlanning(day, startTime, endTime, module, teacher, room, index)
-            } else {
-                savePlanning(day, startTime, endTime, module, teacher, room, 1)
-            }
+            savePlanning(day, startTime, endTime, module, teacher, room)
             closeModal()
         }
     })
@@ -99,7 +94,7 @@ function closeModal() {
 }
 cancelButton.addEventListener('click', closeModal)
 
-function savePlanning(day, startTime, endTime, module, teacher, room, index) {
+function savePlanning(day, startTime, endTime, module, teacher, room) {
     const planning = {
         'day': day,
         'start': startTime,
@@ -108,7 +103,7 @@ function savePlanning(day, startTime, endTime, module, teacher, room, index) {
         'teacher': teacher,
         'room': room
     }
-    localStorage.setItem(index, JSON.stringify(planning))
+    localStorage.setItem(Date.now(), JSON.stringify(planning))
 }
 
 function fillHours(selectInput, startTime, endTime) {
