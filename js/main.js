@@ -2,20 +2,6 @@ import { Course } from './Course.js'
 import { createPlanning } from "./dom_api.js";
 import { appendTo } from "./dom_api.js";
 
-class Planning {
-
-    #cours = []
-    #nomPlanning = ""
-    #jours = []
-
-    constructor(cours) {
-
-    }
-}
-
-let p = new Course("JS", "Aly", 102, "L2 GLRS A",10, 13)
-let p1 = new Course("C", "Wane", 103, "IAGE B",10, 12)
-
 const planningInfos = [
     ["Enseignants" ,"Aly", "Baila", "Ndoye", "Mbaye", "Djibi", "Seckouba"],
     ["Salles", "101", "102", "103", "104", "201", "incube"],
@@ -26,7 +12,6 @@ const planningInfos = [
 const btnSwitch = document.querySelector('.switch-display-mode')
 const planningInfo = document.querySelectorAll('.planning-info')
 const planningChoice = document.querySelector('#planning-choice')
-
 
 btnSwitch.addEventListener('click', () => btnSwitch.classList.toggle('active'))
 
@@ -62,13 +47,29 @@ function addPlanning() {
         const startTime = selectInput[3].value.split(' ')[0]
         const endTime = selectInput[4].value.split(' ')[0]
 
-        if (!checkSelectInput(module, teacher, room) || !checkSelectInput(startTime, endTime)) {
+        const newCourse = new Course(module, teacher, room, '', startTime, endTime, day)
+
+        if (!checkSelectInput()) {
             errorPara.innerText = 'Veuillez selectionner tous les options'
             errorPara.style.display = 'block'
         } else {
             errorPara.style.display = 'none'
-            appendTo(day, startTime, endTime, createPlanning(module, teacher, room))
-            savePlanning(day, startTime, endTime, module, teacher, room)
+            let sameDay = Object.values(localStorage).map((element) => JSON.parse(element)).filter((element) => element.day == day)
+            if (sameDay.length != 0) {
+                let sameRoom = sameDay.filter((element) => element.room == room)
+                if (sameRoom.length != 0) {
+                    let intersectHour = sameRoom.filter((element) => newCourse.isIntersect(element.start, element.end))
+                    if (intersectHour.length != 0) {
+                        errorPara.innerText = 'Cette classe ne peut contenir 1 effectif de cette salle'
+                        errorPara.style.display = 'block'
+                        return
+                    }
+                }
+            }
+            let id = Date.now()
+            appendTo(day, startTime, endTime, createPlanning(teacher, module, room, id))
+            newCourse.saveCourse(id)
+            errorPara.style.display = 'none'
             closeModal()
         }
     })
@@ -78,33 +79,18 @@ function clearSelectInput() {
     selectInput.forEach((select) => select.innerHTML = '')
 }
 
-function checkSelectInput(...data) {
-    for (const select of selectInput) {
-        for (let i = 0; i < data.length; i++) {
-            if (data[i] == select.options[0].value) {
-                return false
-            }
-        }
-    }
+function checkSelectInput() {
+    for (const select of selectInput)
+        if (select.selectedIndex == 0)
+            return false
     return true
 }
 
 function closeModal() {
+    errorPara.style.display = 'none'
     modalContainer.classList.remove('active')
 }
 cancelButton.addEventListener('click', closeModal)
-
-function savePlanning(day, startTime, endTime, module, teacher, room) {
-    const planning = {
-        'day': day,
-        'start': startTime,
-        'end': endTime,
-        'module': module,
-        'teacher': teacher,
-        'room': room
-    }
-    localStorage.setItem(Date.now(), JSON.stringify(planning))
-}
 
 function fillHours(selectInput, startTime, endTime) {
     selectInput.innerHTML = `<option>Choisir une heure</option>`

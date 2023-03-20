@@ -26,8 +26,12 @@ export function createElement(tagName, attributes = {}, content = '') {
  * @returns {HTMLDivElement}
  */
 
-export function createPlanning(moduleName, teacher, room) {
-    const planning = createElement('div', {class: 'planning'})
+export function createPlanning(moduleName, teacher, room, id) {
+    const colors = ["#2ecc71", "#f39c12", "#e74c3c", "#3498db", "#f1c40f", "#8e44ad", "#16a085", "#95a5a6"]
+
+    const planning = createElement('div', {class: 'planning', id: id})
+    planning.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
+
     const firstElement = createElement('span', {}, moduleName)
     const secondElement = createElement('span', {}, teacher)
     const lastElement = createElement('span', {}, room)
