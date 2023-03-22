@@ -7,6 +7,11 @@ export const modules = getSavedData("modules");
 export const classes = getSavedData("classes");
 export const salles = getSavedData("salles");
 
+console.log(profs);
+console.log(modules);
+console.log(classes);
+console.log(salles);
+
 const btnSwitch = document.querySelector('.switch-display-mode')
 const planningInfo = document.querySelectorAll('.planning-info')
 const planningChoice = document.querySelector('#planning-choice')
@@ -33,39 +38,61 @@ function addPlanning() {
         const moduleObject = getModuleNameById(module)
         const teacherObject = getTeacherNameById(teacher)
         const roomObject = getClassroomById(room)
-        //console.log(moduleObject, teacherObject, roomObject);
+
         const newCourse = new Course(module, teacher, room, '', startTime, endTime, day)
         const teacherPlanning = getTeacherPlannings(teacher)
-        if (teacherPlanning) {
-            if (newCourse.isIntersect(teacherPlanning.heureDebut, teacherPlanning.heureFin)) {
-                
-            }
-        }
-
-        return
-
-
+        let p = teacherPlanning.filter(planning => planning.day == day)
+        let sameHour = p?.find(planning => newCourse.isIntersect(planning.heureDebut, planning.heureFin))
+        
         if (!checkSelectInput()) {
             errorPara.innerText = 'Veuillez selectionner tous les options'
             errorPara.style.display = 'block'
         } else {
             errorPara.style.display = 'none'
-            let sameDay = Object.values(localStorage).map((element) => JSON.parse(element)).filter((element) => Number(element.day) == day)
-            if (sameDay.length != 0) {
-                let intersectHour = sameDay.filter((element) => newCourse.isIntersect(Number(element.start), Number(element.end)))
-                if (intersectHour.length != 0) {
-                    errorPara.innerText = 'Cette salle est ocuppée en ce moment'
-                    errorPara.style.display = 'block'
-                    return
-                }
+            if (sameHour) {
+                errorPara.innerText = 'Cette salle est ocuppée en ce moment'
+                errorPara.style.display = 'block'
+                return
             }
-            let id = Date.now()
-            appendTo(day, startTime, endTime, createPlanning(teacher, module, room, id))
-            newCourse.saveCourse(id)
-            errorPara.style.display = 'none'
-            closeModal()
+            appendTo(day, startTime, endTime, createPlanning(teacherObject.nom, moduleObject.nom, roomObject.nom));
+            savePlanning(+day, +startTime, +endTime, +module, +room, 2, +teacher);
+            errorPara.style.display = 'none';
+            closeModal();
         }
     })
+}
+
+function savePlanning(day, startTime, endTime, module, room, level, teacher,semaine = {}) {
+    const planning = {
+        module,
+        room,
+        level,
+        day,
+        heureDebut: startTime,
+        heureFin: endTime
+    }
+    savePlanningTo(planning, teacher, profs)
+    savePlanningTo(planning, module, modules)
+    savePlanningTo(planning, level, classes)
+    savePlanningTo(planning, room, salles)
+    
+    savePlanningToLocalStorage('profs', profs)
+    savePlanningToLocalStorage('classes', classes)
+    savePlanningToLocalStorage('salles', salles)
+    savePlanningToLocalStorage('modules', modules)
+}
+
+function savePlanningTo(planning, id, tabEntity) {
+    for (const p of tabEntity) {
+        if (p.id == id) {
+            p.plannings.push(planning)
+            console.log(p);
+        }
+    }
+}
+
+function savePlanningToLocalStorage(entity, value) {
+    localStorage.setItem(entity, JSON.stringify(value))
 }
 
 function clearSelectInput() {
@@ -101,11 +128,17 @@ function fillInputSelect(select, data, label = 'Selectionner') {
 
 /*----------------------------------------------------------------------------------------------------------*/
 
-function showPlanning(planningName, entity) {
-    for (const [key, value] of Object.entries(localStorage)) {
-        let dataObject = JSON.parse(value)
-        if (dataObject[entity] == planningName) {
-            appendTo(dataObject.day, dataObject.start, dataObject.end, createPlanning(dataObject.teacher, dataObject.module, dataObject.room, key))
+function showPlanning(planningName, tabEntity) {
+    const element = getModuleNameById(planningName)
+    console.log(element);
+    for (const planning of element.plannings) {
+        const profs = getTeachersByModuleId(planning.module)
+        for (const prof of profs) {
+            for (const p of prof.plannings) {
+                if (p.module == element.id) {
+                    appendTo(planning.day, planning.heureDebut, planning.heureFin, createPlanning(element.nom, prof.nom, getClassroomById(p.room).nom))
+                }
+            }
         }
     }
 }
@@ -171,13 +204,14 @@ planningChoice.addEventListener('change', () => {
 
     const activePlanningInfo = Array.from(planningInfo).filter(element => element.classList.contains('active'))[0]
     clearPlanning()
+    console.log(planningChoice.value);
     if (activePlanningInfo.id == "teacher") {
-        showPlanning(planningChoice.value, "teacher")
+        showPlanning(planningChoice.value, profs)
     } else if (activePlanningInfo.id == "level") {
-        showPlanning(planningChoice.value, "level")
+        showPlanning(planningChoice.value, classes)
     } else if (activePlanningInfo.id == "room") {
-        showPlanning(planningChoice.value, "room")
+        showPlanning(planningChoice.value, salles)
     } else if (activePlanningInfo.id == "module") {
-        showPlanning(planningChoice.value, "module")
+        showPlanning(planningChoice.value, modules)
     }
 })

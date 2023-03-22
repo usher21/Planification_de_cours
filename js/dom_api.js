@@ -26,10 +26,10 @@ export function createElement(tagName, attributes = {}, content = '') {
  * @returns {HTMLDivElement}
  */
 
-export function createPlanning(moduleName, teacher, room, id) {
+export function createPlanning(moduleName, teacher, room) {
     const colors = ["#2ecc71", "#f39c12", "#e74c3c", "#3498db", "#f1c40f", "#8e44ad", "#16a085", "#95a5a6"]
 
-    const planning = createElement('div', {class: 'planning', id: id})
+    const planning = createElement('div', {class: 'planning'})
     planning.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)]
 
     const firstElement = createElement('span', {}, moduleName)
@@ -63,9 +63,11 @@ export function appendTo(day, startTime, endTime, element) {
     if (parentElement.children.length > 1) {
         for (let i = 1; i < parentElement.children.length; i++) {
             const gridColumn = +getComputedStyle(parentElement.children[i]).gridColumn[0]
+            element.style.gridColumn = `${startTime - 6} / span ${endTime - startTime}`
             if (gridColumn > (startTime - 6)) {
-                element.style.gridColumn = `${startTime - 6} / span ${endTime - startTime}`
                 parentElement.children[i].insertAdjacentElement('beforebegin', element)
+            } else {
+                parentElement.appendChild(element)
             }
         }
     } else {
