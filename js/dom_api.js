@@ -39,6 +39,11 @@ export function createPlanning(moduleName, teacher, room, id) {
 
     planning.append(firstElement, secondElement, lastElement, btnDelete)
 
+    btnDelete.addEventListener('click', () => {
+        planning.remove()
+        localStorage.removeItem(planning.id)
+    })
+
     return planning
 }
 
@@ -53,13 +58,26 @@ export function createPlanning(moduleName, teacher, room, id) {
  */
 
 export function appendTo(day, startTime, endTime, element) {
-    const parent = document.querySelector(`#d_${day}`)
     element.style.gridColumn = `${startTime - 6} / span ${endTime - startTime}`
-    parent.append(element)
+    let parentElement = document.querySelector(`#d_${day}`)
+    if (parentElement.children.length > 1) {
+        for (let i = 1; i < parentElement.children.length; i++) {
+            const gridColumn = +getComputedStyle(parentElement.children[i]).gridColumn[0]
+            if (gridColumn > (startTime - 6)) {
+                element.style.gridColumn = `${startTime - 6} / span ${endTime - startTime}`
+                parentElement.children[i].insertAdjacentElement('beforebegin', element)
+            }
+        }
+    } else {
+        parentElement.appendChild(element)
+    }
 }
 
 /*-------------------------------------------------------------------------------------------------------*/
 
-
+export function createOption(value, text) {
+    const option = createElement('option', {value: value}, text)
+    return option
+}
 
 /*-------------------------------------------------------------------------------------------------------*/
