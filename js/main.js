@@ -1,6 +1,8 @@
 import { Course } from './Course.js'
 import { createPlanning, appendTo, createOption } from "./dom_api.js";
-import { getModuleNameById, getClassroomById, getLevelNameById, getTeachersByModuleId, getSavedData, getTeacherNameById, getTeacherPlannings } from "./utils.js";
+import { getDataById, getPlanningsOf, getCurrentPlannings, getTeachersByModuleId } from "./utils.js";
+import { showTeacherPlanning, showModulePlanning, showClassroomPlanning, showLevelPlanning } from "./utils.js";
+import { getSavedData, resetSavedData } from "./data.js";
 
 export const profs = getSavedData("profs");
 export const modules = getSavedData("modules");
@@ -10,6 +12,7 @@ export const salles = getSavedData("salles");
 const btnSwitch = document.querySelector('.switch-display-mode')
 const planningInfo = document.querySelectorAll('.planning-info')
 const planningChoice = document.querySelector('#planning-choice')
+const planningName = document.querySelector('.planning-name')
 
 /*----------------------------------------------------------------------------------------------------------*/
 const modalContainer = document.querySelector('.modal-container')
@@ -23,53 +26,112 @@ addPlanning()
 
 function addPlanning() {
     addBtn.addEventListener('click', () => {
-        const day = Number(modalContainer.querySelector('.day').innerText)
-        const module = selectInput[0].value
-        const teacher = selectInput[1].value
-        const room = Number(selectInput[2].value)
-        const startTime = Number(selectInput[3].value.split(' ')[0])
-        const endTime = Number(selectInput[4].value.split(' ')[0])
 
-        const moduleObject = getModuleNameById(module)
-        const teacherObject = getTeacherNameById(teacher)
-        const roomObject = getClassroomById(room)
-        //console.log(moduleObject, teacherObject, roomObject);
-        const newCourse = new Course(module, teacher, room, '', startTime, endTime, day)
-        const teacherPlanning = getTeacherPlannings(teacher)
-        if (teacherPlanning) {
-            if (newCourse.isIntersect(teacherPlanning.heureDebut, teacherPlanning.heureFin)) {
-                
-            }
-        }
+        const { day, module, teacher, room, startTime, endTime } = getSelectedValues()
 
-        return
+        const moduleObject = getDataById(module, modules)
+        const teacherObject = getDataById(teacher, profs)
+        const roomObject = getDataById(room, salles)
 
+        const newCourse = new Course(moduleObject?.nom, teacherObject?.nom, roomObject?.nom, '', startTime, endTime, day)
+
+        const teacherPlanning = getPlanningsOf(teacher, profs)
 
         if (!checkSelectInput()) {
-            errorPara.innerText = 'Veuillez selectionner tous les options'
-            errorPara.style.display = 'block'
+            showErrorMessage('Veuillez selectionner tous les options')
         } else {
             errorPara.style.display = 'none'
-            let sameDay = Object.values(localStorage).map((element) => JSON.parse(element)).filter((element) => Number(element.day) == day)
-            if (sameDay.length != 0) {
-                let intersectHour = sameDay.filter((element) => newCourse.isIntersect(Number(element.start), Number(element.end)))
-                if (intersectHour.length != 0) {
-                    errorPara.innerText = 'Cette salle est ocuppée en ce moment'
-                    errorPara.style.display = 'block'
+
+            const currentPlanning = getCurrentPlannings(planningChoice.value)
+
+            if (getDataById(planningChoice.value, classes).effectif > roomObject.effectif) {
+                showErrorMessage('Cette salle ne peut contenir un effectif de classe')
+                return
+            }
+
+            for (const planning of currentPlanning.plannings) {
+                if (planning.day == day && newCourse.isIntersect(planning.heureDebut, planning.heureFin)) {
+                    showErrorMessage('Cette heure est ocuppée en ce moment')
                     return
                 }
             }
-            let id = Date.now()
-            appendTo(day, startTime, endTime, createPlanning(teacher, module, room, id))
-            newCourse.saveCourse(id)
-            errorPara.style.display = 'none'
-            closeModal()
+
+            for (const planning of teacherPlanning) {
+                if (planning.day == day && newCourse.isIntersect(planning.heureDebut, planning.heureFin)) {
+                    showErrorMessage(`Le professeur ${getDataById(teacher, profs).nom} a cours en ce moment avec la classe ${getDataById(planning.level, classes).nom}`)
+                    return
+                }
+            }
+
+            appendTo(day, startTime, endTime, createPlanning(teacherObject.nom, moduleObject.nom, roomObject.nom));
+            savePlanning(+day, +startTime, +endTime, +module, +room, +planningChoice.value, +teacher);
+            errorPara.style.display = 'none';
+            closeModal();
         }
     })
 }
 
+function showErrorMessage(errorMessage) {
+    errorPara.innerText = errorMessage
+    errorPara.style.display = 'block'
+}
+
+function getSelectedValues() {
+    return {
+        day: +modalContainer.querySelector('.day').innerText,
+        module: selectInput[0].value,
+        teacher: selectInput[1].value,
+        room: Number(selectInput[2].value),
+        startTime: Number(selectInput[3].value.split(' ')[0]),
+        endTime: Number(selectInput[4].value.split(' ')[0])
+    }
+}
+
+function savePlanning(day, startTime, endTime, module, room, level, teacher, semaine = {}) {
+    const planning = {
+        module,
+        teacher,
+        room,
+        level,
+        day,
+        heureDebut: startTime,
+        heureFin: endTime
+    }
+    savePlanningTo(planning, teacher, profs)
+    savePlanningTo(planning, module, modules)
+    savePlanningTo(planning, level, classes)
+    savePlanningTo(planning, room, salles)
+
+    savePlanningToLocalStorage('profs', profs)
+    savePlanningToLocalStorage('classes', classes)
+    savePlanningToLocalStorage('salles', salles)
+    savePlanningToLocalStorage('modules', modules)
+}
+
+function savePlanningTo(planning, id, tabEntity) {
+    for (const p of tabEntity) {
+        if (p.id == id) {
+            p.plannings.push(planning)
+        }
+    }
+}
+
+function savePlanningToLocalStorage(entity, value) {
+    localStorage.setItem(entity, JSON.stringify(value))
+}
+
 function clearSelectInput() {
     selectInput.forEach((select) => select.innerHTML = '')
+}
+
+function toggleOpenModalBtnState() {
+    openModal.forEach(plusBtn => {
+        if (!plusBtn.classList.contains('disabled')) {
+            plusBtn.classList.add('disabled')
+        } else {
+            plusBtn.classList.remove('disabled')
+        }
+    })
 }
 
 function checkSelectInput() {
@@ -99,17 +161,6 @@ function fillInputSelect(select, data, label = 'Selectionner') {
     }
 }
 
-/*----------------------------------------------------------------------------------------------------------*/
-
-function showPlanning(planningName, entity) {
-    for (const [key, value] of Object.entries(localStorage)) {
-        let dataObject = JSON.parse(value)
-        if (dataObject[entity] == planningName) {
-            appendTo(dataObject.day, dataObject.start, dataObject.end, createPlanning(dataObject.teacher, dataObject.module, dataObject.room, key))
-        }
-    }
-}
-
 function clearPlanning() {
     for (let i = 1; i <= 6; i++) {
         let element = document.querySelector(`#d_${i}`)
@@ -132,25 +183,30 @@ planningInfo.forEach(planning => {
 
         const label = planning.querySelector('.planning-info-name').innerText
 
+        openModal.forEach(plusBtn => plusBtn.classList.add('disabled'))
+
         if (planning.id == "teacher")
             fillInputSelect(planningChoice, profs, label)
         else if (planning.id == "module")
             fillInputSelect(planningChoice, modules, label)
         else if (planning.id == "room")
             fillInputSelect(planningChoice, salles, label)
-        else if (planning.id == "level")
+        else if (planning.id == "level") {
             fillInputSelect(planningChoice, classes, label)
+        }
     })
 })
 
 for (const plusBtn of openModal) {
     plusBtn.onclick = (e) => {
-        modalContainer.querySelector('.day').innerText = e.currentTarget.parentElement.classList.item(0)[3]
-        modalContainer.classList.add('active')
-        clearSelectInput()
-        fillInputSelect(selectInput[0], modules, 'Choisir un module')
-        fillInputSelect(selectInput[2], salles, 'Choisir une salle')
-        fillHours(selectInput[3], 8, 16)
+        if (!plusBtn.classList.contains('disabled')) {
+            modalContainer.querySelector('.day').innerText = e.currentTarget.parentElement.classList.item(0)[3]
+            modalContainer.classList.add('active')
+            clearSelectInput()
+            fillInputSelect(selectInput[0], modules, 'Choisir un module')
+            fillInputSelect(selectInput[2], salles, 'Choisir une salle')
+            fillHours(selectInput[3], 8, 16)
+        }
     }
 }
 
@@ -166,18 +222,26 @@ selectInput[3].addEventListener('change', () => {
 })
 
 planningChoice.addEventListener('change', () => {
-    if (planningChoice.selectedIndex == 0)
-        return
+    const activeCategory = Array.from(planningInfo).find(planning => planning.classList.contains('active'))
 
-    const activePlanningInfo = Array.from(planningInfo).filter(element => element.classList.contains('active'))[0]
+    if (activeCategory.id == "level" && planningChoice.selectedIndex != 0)
+        openModal.forEach(plusBtn => plusBtn.classList.remove('disabled'))
+
     clearPlanning()
-    if (activePlanningInfo.id == "teacher") {
-        showPlanning(planningChoice.value, "teacher")
-    } else if (activePlanningInfo.id == "level") {
-        showPlanning(planningChoice.value, "level")
-    } else if (activePlanningInfo.id == "room") {
-        showPlanning(planningChoice.value, "room")
-    } else if (activePlanningInfo.id == "module") {
-        showPlanning(planningChoice.value, "module")
+
+    planningName.textContent = 'Planning: '
+
+    if (activeCategory.id == "teacher") {
+        showTeacherPlanning(planningChoice.value, profs)
+        planningName.textContent += getDataById(planningChoice.value, profs).nom
+    } else if (activeCategory.id == "level") {
+        showLevelPlanning(planningChoice.value)
+        planningName.textContent += getDataById(planningChoice.value, classes).nom
+    } else if (activeCategory.id == "room") {
+        showClassroomPlanning(planningChoice.value)
+        planningName.textContent += getDataById(planningChoice.value, salles).nom
+    } else if (activeCategory.id == "module") {
+        showModulePlanning(planningChoice.value)
+        planningName.textContent += getDataById(planningChoice.value, modules).nom
     }
 })

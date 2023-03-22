@@ -234,9 +234,6 @@ body {
     grid-template-columns: 200px repeat(10, 1fr);
     align-items: center;
     border-radius: 15px;
-}
-
-.schedule_day > div {
     background-color: #f2ffcd3d;
     height: 100%;
 }
@@ -257,6 +254,10 @@ body {
 .schedule_day > div > :first-child > i {
     color: var(--green);
     cursor: pointer;
+}
+
+.schedule_day > div > :first-child > i.disabled {
+    color: #1f8549;
 }
 
 .schedule_day > div .planning {

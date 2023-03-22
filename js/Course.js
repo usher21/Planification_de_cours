@@ -58,7 +58,7 @@ export class Course {
     }
 
     isIncludes(hour) {
-        return hour > this.#startTime && hour < this.#endTime
+        return hour >= this.#startTime && hour <= this.#endTime
     }
 
     isIntersect(startTime, endTime) {
