@@ -9,6 +9,11 @@ export const modules = getSavedData("modules");
 export const classes = getSavedData("classes");
 export const salles = getSavedData("salles");
 
+console.log(profs);
+console.log(modules);
+console.log(classes);
+console.log(salles);
+
 const btnSwitch = document.querySelector('.switch-display-mode')
 const planningInfo = document.querySelectorAll('.planning-info')
 const planningChoice = document.querySelector('#planning-choice')
@@ -107,7 +112,6 @@ function savePlanning(day, startTime, endTime, module, room, level, teacher, sem
     savePlanningTo(planning, module, modules)
     savePlanningTo(planning, level, classes)
     savePlanningTo(planning, room, salles)
-
     savePlanningToLocalStorage('profs', profs)
     savePlanningToLocalStorage('classes', classes)
     savePlanningToLocalStorage('salles', salles)
