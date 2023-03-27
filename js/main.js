@@ -1,5 +1,5 @@
 import { Course } from './Course.js'
-import { createPlanning, appendTo, createOption } from "./dom_api.js";
+import { createPlanning, appendTo, createOption, createElement } from "./dom_api.js";
 import { getDataById, getPlanningsOf, getCurrentPlannings, getTeachersByModuleId } from "./utils.js";
 import { showTeacherPlanning, showModulePlanning, showClassroomPlanning, showLevelPlanning } from "./utils.js";
 import { getSavedData, resetSavedData } from "./data.js";
@@ -21,6 +21,12 @@ const addBtn = document.querySelector('.add-planning')
 const cancelButton = document.querySelector('.cancel')
 const selectInput = modalContainer.querySelectorAll('select')
 const errorPara = document.querySelector('.error')
+
+const searchInput = document.querySelector('#search')
+const searchResultContainer = document.querySelector('.search-results')
+const sideElements = document.querySelector('.planning-infos')
+const sideSelectContainer = document.querySelector('.selected-planning-container')
+const emptyResult = document.querySelector('.empty-result')
 
 addPlanning()
 
@@ -124,16 +130,6 @@ function clearSelectInput() {
     selectInput.forEach((select) => select.innerHTML = '')
 }
 
-function toggleOpenModalBtnState() {
-    openModal.forEach(plusBtn => {
-        if (!plusBtn.classList.contains('disabled')) {
-            plusBtn.classList.add('disabled')
-        } else {
-            plusBtn.classList.remove('disabled')
-        }
-    })
-}
-
 function checkSelectInput() {
     for (const select of selectInput)
         if (select.selectedIndex == 0)
@@ -168,6 +164,40 @@ function clearPlanning() {
         element.innerHTML = ''
         element.appendChild(child)
     }
+}
+
+/*----------------------------------------------------------------------------------------------------------*/
+
+function showResults(searchValue, dataArray, searchResultContainer, category) {
+    for (const dataObject of dataArray) {
+        if (dataObject.nom.toString().toLowerCase().includes(searchValue)) {
+            const resultItem = createElement('li', {class: `result-item ${category}`, id: `${dataObject.id}`}, dataObject.nom)
+            searchResultContainer.appendChild(resultItem)
+            handleSearchEvent(resultItem)
+        }
+    }
+}
+
+function handleSearchEvent(searchItem) {
+    searchItem.addEventListener('click', () => {
+
+        clearPlanning()
+
+        if (searchItem.classList.contains('prof')) {
+            showTeacherPlanning(searchItem.id)
+        } else if (searchItem.classList.contains('classe')) {
+            showLevelPlanning(searchItem.id)
+        } else if (searchItem.classList.contains('salle')) {
+            showClassroomPlanning(searchItem.id)
+        } else if (searchItem.classList.contains('module')) {
+            showModulePlanning(searchItem.id)
+        }
+
+        searchResultContainer.innerHTML = ''
+        sideElements.style.display = 'grid'
+        sideSelectContainer.style.display = 'block'
+        planningName.innerText = 'Planning: ' + searchItem.innerText
+    })
 }
 
 /*----------------------------------------------------------------------------------------------------------*/
@@ -232,7 +262,7 @@ planningChoice.addEventListener('change', () => {
     planningName.textContent = 'Planning: '
 
     if (activeCategory.id == "teacher") {
-        showTeacherPlanning(planningChoice.value, profs)
+        showTeacherPlanning(planningChoice.value)
         planningName.textContent += getDataById(planningChoice.value, profs).nom
     } else if (activeCategory.id == "level") {
         showLevelPlanning(planningChoice.value)
@@ -244,4 +274,28 @@ planningChoice.addEventListener('change', () => {
         showModulePlanning(planningChoice.value)
         planningName.textContent += getDataById(planningChoice.value, modules).nom
     }
+})
+
+searchInput.addEventListener('input', () => {
+    
+    const searchValue = searchInput.value.trim().toLowerCase()
+
+    emptyResult.style.display = 'none'
+    sideElements.style.display = 'none'
+    sideSelectContainer.style.display = 'none'
+    searchResultContainer.innerHTML = ''
+
+    if (searchValue == '') {
+        sideElements.style.display = 'grid'
+        sideSelectContainer.style.display = 'block'
+        return
+    }
+
+    showResults(searchValue, profs, searchResultContainer, "prof")
+    showResults(searchValue, classes, searchResultContainer, "classe")
+    showResults(searchValue, salles, searchResultContainer, "salle")
+    showResults(searchValue, modules, searchResultContainer, "module")
+    
+    if (searchResultContainer.childElementCount == 0)
+        emptyResult.style.display = 'block'
 })

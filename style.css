@@ -11,6 +11,8 @@
     --orange:  #f39c12;
     --gray: #414141;
     --light-gray: #ccc;
+    --white: #f1f1f1;
+    --light-midlle-gray: #f2ffcd3d;
 }
 
 body {
@@ -27,7 +29,6 @@ body {
 .container .sidebar {
     grid-column: 1;
     padding: 1rem;
-    background-color: #414141;
     height: 100%;
 }
 
@@ -37,7 +38,7 @@ body {
 
 .sidebar .search-container .search-input {
     width: 100%;
-    margin: 1.8rem 0;
+    margin: 1.8rem 0 .5rem;
 }
 
 .search-container .search-input input {
@@ -47,6 +48,30 @@ body {
     border: none;
     outline: none;
     background-color: #ccc;
+}
+
+.search-container .search-results {
+    list-style-type: none;
+}
+
+.search-container .search-results > .result-item {
+    padding: 1rem 1rem;
+    font-size: 1.2rem;
+    color: #FFF;
+    border-radius: 10px;
+    cursor: pointer;
+}
+
+.search-container .search-results > .result-item:hover {
+    background-color: #6f6b6b;
+}
+
+.search-container .empty-result {
+    margin-top: 3rem;
+    font-size: 1.5rem;
+    color: #e74c3c;
+    text-align: center;
+    display: none;
 }
 
 .container .sidebar .planning-infos {
@@ -234,7 +259,7 @@ body {
     grid-template-columns: 200px repeat(10, 1fr);
     align-items: center;
     border-radius: 15px;
-    background-color: #f2ffcd3d;
+    background-color: var(--light-midlle-gray);
     height: 100%;
 }
 
